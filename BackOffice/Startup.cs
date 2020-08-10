@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackOffice.BackgroundTasks;
 using BackOffice.DBContext;
 using BackOffice.Services;
 using Microsoft.AspNetCore.Builder;
@@ -38,7 +39,7 @@ namespace BackOffice
             services.AddControllers()
                     .AddNewtonsoftJson(options =>
                         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                    );          
+                    );
 
             // configure Redis connection string
             services.AddSingleton<IConnectionMultiplexer>(options =>
@@ -46,8 +47,9 @@ namespace BackOffice
             );
 
             services.AddSingleton<ICacheService, RedisCacheService>();
+            services.AddSingleton<IPublishService,RedisPublisherService>();
 
-
+            services.AddHostedService<RedisSubscriber>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -11,9 +11,11 @@ namespace BackOffice.Controllers
     public class CacheController : ControllerBase
     {
         private readonly ICacheService cacheService;
-        public CacheController(ICacheService cacheService)
+        private readonly IPublishService publishService;
+        public CacheController(ICacheService cacheService, IPublishService publishService)
         {
             this.cacheService = cacheService;
+            this.publishService = publishService;
         }
 
         [HttpGet("{key}")]
@@ -27,6 +29,13 @@ namespace BackOffice.Controllers
         public async Task<IActionResult> SetCacheValue([FromBody] NewCacheEntryRequest request)
         {
             await cacheService.SetCacheValueAsync(request.Key, request.Value);
+            return Ok();
+        }
+
+        [HttpPost("Publish")]
+        public async Task<IActionResult> PublishToChannel([FromBody] NewCacheEntryRequest request)
+        {            
+            await publishService.PublishMessageAsync(request.Key, request.Value);
             return Ok();
         }
     }
